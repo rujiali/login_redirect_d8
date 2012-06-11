@@ -1,0 +1,10 @@
+a<?php
+
+/**
+ * Implements hook_install().
+ */
+
+function login_redirect_install() {
+  // Display a welcome message.
+  drupal_set_message(t('Login Redirect module activated.'), 'status');
+}

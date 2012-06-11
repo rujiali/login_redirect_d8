@@ -1,0 +1,65 @@
+a<?php
+
+/**
+ * @file
+ * Allows redirects according to an URL parameter after logins.
+ *
+ */
+
+/**
+ * Implementation of hook_menu().
+ */
+function login_redirect_menu() {
+  $items['admin/login_redirect'] = array(
+    'title' => t('Login Redirect'),
+    'description' => t('Main page of the module.'),
+    'page callback' => 'login_redirect_main_page',
+    'access arguments' => array('administer site configuration')
+  );
+
+  $items['admin/login_redirect/settings'] = array(
+    'title' => t('Login Redirect Settings'),
+    'description' => t('Adjust Login Redirect settings.'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('login_redirect_admin_settings'),
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'login_redirect.admin.inc'
+  );
+
+  return $items;
+}
+
+/**
+ * Implementation of hook_form_alter().
+ */
+function login_redirect_form_user_login_alter(&$form, &$form_state, $form_id) {
+  $status = variable_get('login_redirect_status', 0);
+  if ($status !== 0) {
+    $parameter_name = variable_get('login_redirect_parameter_name');
+    if (isset($_GET[$parameter_name])) {
+      $form['destination'] = array(
+        '#type' => 'value',
+        '#value' => $_GET[$parameter_name]
+      );
+
+      $form['#submit'][] = 'login_redirect_user_login_redirect';
+    }
+  }
+}
+
+/**
+ * Performs redirection after form submission.
+ */
+function login_redirect_user_login_redirect(&$form, &$form_state) {
+  drupal_goto($form_state['values']['destination'], array('external' => TRUE));
+}
+
+/**
+ * Contents of the main page.
+ */
+function login_redirect_main_page() {
+  $output = '';
+  $output .= t('Thank you for installing Login Redirect. Please make sure you proceed to the <a href="@settings">Settings Page</a> and configure Login Redirect properly.', array('@settings' => url('admin/login_redirect/settings')));
+  return $output;
+}
