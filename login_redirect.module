@@ -1,4 +1,4 @@
-a<?php
+<?php
 
 /**
  * @file
@@ -30,6 +30,30 @@ function login_redirect_menu() {
   return $items;
 }
 
+/**
+ * Implementation of hook_help().
+ */
+function login_redirect_help($path, $arg) {
+  $output = '';
+  // Initialize the variable.
+  switch ($path) {
+    case 'admin/help#login_redirect':
+    $output .= '<h3>' . t('About') . '</h3>';
+    $output .= '<p>' . t('A simple solution to allow redirects toward non-Drupal URLs after a successful user login.') . '</p>';
+    $output .= '<h3>' . t('Author(s):') . '</h3>';
+    $output .= '<p>' . t('legendm33066 &lt;http://drupal.org/user/1290564&gt;') . '</p>';
+    $output .= '<h3>' . t('Installation') . '</h3>';
+    $output .= '<ul>';
+    $output .= '<li>' . l(t('Enable the module'), 'admin/modules') . '</li>';
+    $output .= '<li>' . l(t('Configure the module'), 'admin/login_redirect/settings') . '</li>';
+    $output .= '</ul>';
+    $output .= '<h3>' . t('Uses') . '</h3>';
+    $output .= '<p>' . t('Append the redirection URL parameter to the Login page using the parameter name defined in the <a href="@settings">Settings page</a>. For example, if you set the parameter name to "destination", then you would visit user/login?destination=http://www.google.com if you want to redirect the user to Google after login.', array('@settings' => url('admin/login_redirect/settings'))) . '</p>';
+    $output .= '<h3>' . '<font color="red">' . t('Notice') . '</font>' . '</h3>';
+    $output .= '<p>' . '<font color="red">' . t('The URL passed parameter ALWAYS overrides the "destination" parameter handled by Drupal itself.') . '</font>' . '</p>';
+    return $output;
+  } 
+}
 /**
  * Implementation of hook_form_alter().
  */
