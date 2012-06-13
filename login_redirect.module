@@ -62,12 +62,17 @@ function login_redirect_form_user_login_alter(&$form, &$form_state, $form_id) {
   if ($status !== 0) {
     $parameter_name = variable_get('login_redirect_parameter_name');
     if (isset($_GET[$parameter_name])) {
-      $form['destination'] = array(
-        '#type' => 'value',
-        '#value' => $_GET[$parameter_name]
-      );
+      if (!empty($_GET[$parameter_name])) {
+        $destination = check_plain(filter_xss($_GET[$parameter_name]));
+          if (preg_match('|^http(s)?://[a-z0-9-]+(.[a-z0-9-]+)*(:[0-9]+)?(/.*)?$|i', $destination) !== 1) {
+            $form['destination'] = array(
+              '#type' => 'value',
+              '#value' => $destination
+            );
+          }
 
-      $form['#submit'][] = 'login_redirect_user_login_redirect';
+        $form['#submit'][] = 'login_redirect_user_login_redirect';
+      }
     }
   }
 }
@@ -76,7 +81,12 @@ function login_redirect_form_user_login_alter(&$form, &$form_state, $form_id) {
  * Performs redirection after form submission.
  */
 function login_redirect_user_login_redirect(&$form, &$form_state) {
-  drupal_goto($form_state['values']['destination'], array('external' => TRUE));
+  foreach ($form_state['values'] as $key => $value) {
+    $$key = check_plain(filter_xss($value));
+  }
+  if (isset($destination)) {
+    drupal_goto($destination, array('external' => TRUE));
+  }
 }
 
 /**
