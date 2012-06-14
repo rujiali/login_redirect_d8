@@ -3,6 +3,5 @@ description = "Provides a method to redirect according to an URL-defined paramet
 package = User
 core = 7.x
 files[] = login_redirect.module
-files[] = login_redirect.install
 files[] = login_redirect.admin.inc
 configure=admin/login_redirect/settings

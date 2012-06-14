@@ -35,7 +35,6 @@ function login_redirect_menu() {
  */
 function login_redirect_help($path, $arg) {
   $output = '';
-  // Initialize the variable.
   switch ($path) {
     case 'admin/help#login_redirect':
     $output .= '<h3>' . t('About') . '</h3>';
@@ -64,29 +63,35 @@ function login_redirect_form_user_login_alter(&$form, &$form_state, $form_id) {
     if (isset($_GET[$parameter_name])) {
       if (!empty($_GET[$parameter_name])) {
         $destination = check_plain(filter_xss($_GET[$parameter_name]));
-          if (preg_match('|^http(s)?://[a-z0-9-]+(.[a-z0-9-]+)*(:[0-9]+)?(/.*)?$|i', $destination) !== 1) {
-            $form['destination'] = array(
-              '#type' => 'value',
-              '#value' => $destination
-            );
-          }
-
-        $form['#submit'][] = 'login_redirect_user_login_redirect';
+        if (valid_url($destination, TRUE)) {
+          $form['destination'] = array(
+            '#type' => 'value',
+            '#value' => $destination
+          );
+          $form['#submit'][] = 'login_redirect_user_login_submit';
+        }
       }
     }
   }
 }
 
 /**
- * Performs redirection after form submission.
+ * Sets shutdown function to perform redirects later.
  */
-function login_redirect_user_login_redirect(&$form, &$form_state) {
-  foreach ($form_state['values'] as $key => $value) {
-    $$key = check_plain(filter_xss($value));
+function login_redirect_user_login_submit(&$form, &$form_state) {
+  if (isset($form_state['values']['destination'])) {
+    $destination = check_plain(filter_xss($form_state['values']['destination']));
+    if (valid_url($destination, TRUE)) {
+      drupal_register_shutdown_function('login_redirect_perform_redirect', $destination);
+    }
   }
-  if (isset($destination)) {
-    drupal_goto($destination, array('external' => TRUE));
-  }
+}
+
+/**
+ * Perform redirects.
+ */
+function login_redirect_perform_redirect($destination) {
+  drupal_goto($destination, array('external' => TRUE));
 }
 
 /**
