@@ -3,58 +3,57 @@
 /**
  * @file
  * Allows redirects according to an URL parameter after logins.
- *
  */
 
 /**
- * Implementation of hook_menu().
+ * Implements hook_menu().
  */
 function login_redirect_menu() {
   $items['admin/login_redirect'] = array(
-    'title' => t('Login Redirect'),
-    'description' => t('Main page of the module.'),
+    'title' => 'Login Redirect',
+    'description' => 'Main page of the module.',
     'page callback' => 'login_redirect_main_page',
-    'access arguments' => array('administer site configuration')
+    'access arguments' => array('administer site configuration'),
   );
 
   $items['admin/login_redirect/settings'] = array(
-    'title' => t('Login Redirect Settings'),
-    'description' => t('Adjust Login Redirect settings.'),
+    'title' => 'Login Redirect Settings',
+    'description' => 'Adjust Login Redirect settings.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('login_redirect_admin_settings'),
     'access arguments' => array('administer site configuration'),
     'type' => MENU_NORMAL_ITEM,
-    'file' => 'login_redirect.admin.inc'
+    'file' => 'login_redirect.admin.inc',
   );
 
   return $items;
 }
 
 /**
- * Implementation of hook_help().
+ * Implements of hook_help().
  */
 function login_redirect_help($path, $arg) {
   $output = '';
   switch ($path) {
     case 'admin/help#login_redirect':
-    $output .= '<h3>' . t('About') . '</h3>';
-    $output .= '<p>' . t('A simple solution to allow redirects toward non-Drupal URLs after a successful user login.') . '</p>';
-    $output .= '<h3>' . t('Author(s):') . '</h3>';
-    $output .= '<p>' . t('legendm33066 &lt;http://drupal.org/user/1290564&gt;') . '</p>';
-    $output .= '<h3>' . t('Installation') . '</h3>';
-    $output .= '<ul>';
-    $output .= '<li>' . l(t('Enable the module'), 'admin/modules') . '</li>';
-    $output .= '<li>' . l(t('Configure the module'), 'admin/login_redirect/settings') . '</li>';
-    $output .= '</ul>';
-    $output .= '<h3>' . t('Uses') . '</h3>';
-    $output .= '<p>' . t('Append the redirection URL parameter to the Login page using the parameter name defined in the <a href="@settings">Settings page</a>. For example, if you set the parameter name to "destination", then you would visit user/login?destination=http://www.google.com if you want to redirect the user to Google after login.', array('@settings' => url('admin/login_redirect/settings'))) . '</p>';
-    $output .= '<h3>' . '<font color="red">' . t('Notice') . '</font>' . '</h3>';
-    $output .= '<p>' . '<font color="red">' . t('The URL passed parameter ALWAYS overrides the "destination" parameter handled by Drupal itself.') . '</font>' . '</p>';
-    return $output;
-  } 
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('A simple solution to allow redirects toward non-Drupal URLs after a successful user login.') . '</p>';
+      $output .= '<h3>' . t('Author(s):') . '</h3>';
+      $output .= '<p>' . t('legendm33066 &lt;http://drupal.org/user/1290564&gt;') . '</p>';
+      $output .= '<h3>' . t('Installation') . '</h3>';
+      $output .= '<ul>';
+      $output .= '<li>' . l(t('Enable the module'), 'admin/modules') . '</li>';
+      $output .= '<li>' . l(t('Configure the module'), 'admin/login_redirect/settings') . '</li>';
+      $output .= '</ul>';
+      $output .= '<h3>' . t('Uses') . '</h3>';
+      $output .= '<p>' . t('Append the redirection URL parameter to the Login page using the parameter name defined in the <a href="@settings">Settings page</a>. For example, if you set the parameter name to "destination", then you would visit user/login?destination=http://www.google.com if you want to redirect the user to Google after login.', array('@settings' => url('admin/login_redirect/settings'))) . '</p>';
+      $output .= '<h3>' . '<font color="red">' . t('Notice') . '</font>' . '</h3>';
+      $output .= '<p>' . '<font color="red">' . t('The URL passed parameter ALWAYS overrides the "destination" parameter handled by Drupal itself.') . '</font>' . '</p>';
+      return $output;
+  }
 }
 /**
- * Implementation of hook_form_alter().
+ * Implements hook_form_alter().
  */
 function login_redirect_form_user_login_alter(&$form, &$form_state, $form_id) {
   $status = variable_get('login_redirect_status', 0);
@@ -66,7 +65,7 @@ function login_redirect_form_user_login_alter(&$form, &$form_state, $form_id) {
         if (valid_url($destination, TRUE)) {
           $form['destination'] = array(
             '#type' => 'value',
-            '#value' => $destination
+            '#value' => $destination,
           );
           $form['#submit'][] = 'login_redirect_user_login_submit';
         }
