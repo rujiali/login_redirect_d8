@@ -6,18 +6,16 @@
  */
 
 /**
- * @file
  * Generates a configuration form.
  */
 function login_redirect_admin_settings() {
   $options = array(0 => t('Disabled'), 1 => t('Enabled'));
-  
   $form['status'] = array(
     '#type' => 'radios',
     '#title' => t('Module Status'),
     '#default_value' => variable_get('login_redirect_status', 0),
     '#options' => $options,
-    '#description' => t('Should the module be enabled?')
+    '#description' => t('Should the module be enabled?'),
   );
   $form['parameter_name'] = array(
     '#type' => 'textfield',
@@ -25,7 +23,6 @@ function login_redirect_admin_settings() {
     '#default_value' => variable_get('login_redirect_parameter_name', 'url'),
     '#description' => t('The alphabetical parameter name used to identify destination defined. For example if the name is set to "destination", then you would visit user/login?destination=(redirect destination).'),
   );
-  
   $form['#submit'][] = 'login_redirect_admin_settings_submit';
   return system_settings_form($form);
 
