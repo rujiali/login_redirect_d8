@@ -20,7 +20,7 @@ function login_redirect_admin_settings() {
   $form['parameter_name'] = array(
     '#type' => 'textfield',
     '#title' => t('Parameter Name'),
-    '#default_value' => variable_get('login_redirect_parameter_name', 'url'),
+    '#default_value' => variable_get('login_redirect_parameter_name', 'destination'),
     '#description' => t('The alphabetical parameter name used to identify destination defined. For example if the name is set to "destination", then you would visit user/login?destination=(redirect destination).'),
   );
   $form['#submit'][] = 'login_redirect_admin_settings_submit';

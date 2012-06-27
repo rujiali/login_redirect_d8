@@ -14,12 +14,9 @@ Author(s):
 Installation
 ------------
 
-1. Place this module directory in your modules folder (usually
-sites/all/modules/).
+1. Install and enable the module.
 
-2. Go to "Modules" (admin/modules) and enable the module.
-
-3. Visit the Settings page (admin/login_redirect/settings) and make sure it's
+2. Visit the Settings page (admin/login_redirect/settings) and make sure it's
 configured correctly.
 
 Uses

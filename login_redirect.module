@@ -9,14 +9,7 @@
  * Implements hook_menu().
  */
 function login_redirect_menu() {
-  $items['admin/login_redirect'] = array(
-    'title' => 'Login Redirect',
-    'description' => 'Main page of the module.',
-    'page callback' => 'login_redirect_main_page',
-    'access arguments' => array('administer site configuration'),
-  );
-
-  $items['admin/login_redirect/settings'] = array(
+  $items['admin/config/system/login_redirect'] = array(
     'title' => 'Login Redirect Settings',
     'description' => 'Adjust Login Redirect settings.',
     'page callback' => 'drupal_get_form',
@@ -40,11 +33,19 @@ function login_redirect_help($path, $arg) {
       $output .= '<p>' . t('A simple solution to allow redirects toward non-Drupal URLs after a successful user login.') . '</p>';
       $output .= '<h3>' . t('Author(s):') . '</h3>';
       $output .= '<p>' . t('legendm33066 &lt;http://drupal.org/user/1290564&gt;') . '</p>';
-      $output .= '<h3>' . t('Installation') . '</h3>';
-      $output .= '<ul>';
-      $output .= '<li>' . l(t('Enable the module'), 'admin/modules') . '</li>';
-      $output .= '<li>' . l(t('Configure the module'), 'admin/login_redirect/settings') . '</li>';
-      $output .= '</ul>';
+
+      // Sets "variables" variable which will later be used to generate a list.
+      $variables = array();
+      $variables['items'] = array(
+        l(t('Enable the module'), 'admin/modules'),
+        l(t('Configure the module'), 'admin/login_redirect/settings'),
+        l(t('Enable the module'), 'admin/modules'),
+        l(t('Configure the module'), 'admin/login_redirect/settings'));
+      $variables['title'] = t('Installation');
+      $variables['type'] = 'ul';
+      $variables['attributes'] = array('');
+      $output .= theme_item_list($variables);
+
       $output .= '<h3>' . t('Uses') . '</h3>';
       $output .= '<p>' . t('Append the redirection URL parameter to the Login page using the parameter name defined in the <a href="@settings">Settings page</a>. For example, if you set the parameter name to "destination", then you would visit user/login?destination=http://www.google.com if you want to redirect the user to Google after login.', array('@settings' => url('admin/login_redirect/settings'))) . '</p>';
       $output .= '<h3>' . '<font color="red">' . t('Notice') . '</font>' . '</h3>';
@@ -59,9 +60,10 @@ function login_redirect_form_user_login_alter(&$form, &$form_state, $form_id) {
   $status = variable_get('login_redirect_status', 0);
   if ($status !== 0) {
     $parameter_name = variable_get('login_redirect_parameter_name');
-    if (isset($_GET[$parameter_name])) {
-      if (!empty($_GET[$parameter_name])) {
-        $destination = check_plain(filter_xss($_GET[$parameter_name]));
+    $params = drupal_get_query_parameters();
+    if (isset($params[$parameter_name])) {
+      if (!empty($params[$parameter_name])) {
+        $destination = check_plain(filter_xss($params[$parameter_name]));
         if (valid_url($destination, TRUE)) {
           $form['destination'] = array(
             '#type' => 'value',
@@ -91,13 +93,4 @@ function login_redirect_user_login_submit(&$form, &$form_state) {
  */
 function login_redirect_perform_redirect($destination) {
   drupal_goto($destination, array('external' => TRUE));
-}
-
-/**
- * Contents of the main page.
- */
-function login_redirect_main_page() {
-  $output = '';
-  $output .= t('Thank you for installing Login Redirect. Please make sure you proceed to the <a href="@settings">Settings Page</a> and configure Login Redirect properly.', array('@settings' => url('admin/login_redirect/settings')));
-  return $output;
 }
