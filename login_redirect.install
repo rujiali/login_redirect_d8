@@ -21,9 +21,7 @@ function login_redirect_install() {
 /**
  * Implements hook_uninstall().
  */
-
 function login_redirect_uninstall() {
   variable_del('login_redirect_status');
   variable_del('login_redirect_parameter_name');
 }
-
