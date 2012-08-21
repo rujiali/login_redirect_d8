@@ -38,16 +38,18 @@ function login_redirect_help($path, $arg) {
       $variables = array();
       $variables['items'] = array(
         l(t('Enable the module'), 'admin/modules'),
-        l(t('Configure the module'), 'admin/login_redirect/settings'),
-        l(t('Enable the module'), 'admin/modules'),
-        l(t('Configure the module'), 'admin/login_redirect/settings'));
+        l(t('Configure the module'), 'admin/config/system/login_redirect'));
       $variables['title'] = t('Installation');
       $variables['type'] = 'ul';
       $variables['attributes'] = array('');
       $output .= theme_item_list($variables);
 
       $output .= '<h3>' . t('Uses') . '</h3>';
-      $output .= '<p>' . t('Append the redirection URL parameter to the Login page using the parameter name defined in the <a href="@settings">Settings page</a>. For example, if you set the parameter name to "destination", then you would visit user/login?destination=http://www.google.com if you want to redirect the user to Google after login.', array('@settings' => url('admin/login_redirect/settings'))) . '</p>';
+      $output .= '<p>' . t('Visit the Login page (usually user/login) and append the redirection URL
+parameter using the parameter name defined in the <a href="@settings">Settings page</a>.
+For example, if you set the parameter name to
+"destination", then you would visit user/login&destination=http://www.google.com
+to have the user redirected to Google (http://www.google.com) after logging in.', array('@settings' => url('admin/login_redirect/settings'))) . '</p>';
       $output .= '<h3>' . '<font color="red">' . t('Notice') . '</font>' . '</h3>';
       $output .= '<p>' . '<font color="red">' . t('The URL passed parameter ALWAYS overrides the "destination" parameter handled by Drupal itself.') . '</font>' . '</p>';
       return $output;

@@ -21,7 +21,7 @@ function login_redirect_admin_settings() {
     '#type' => 'textfield',
     '#title' => t('Parameter Name'),
     '#default_value' => variable_get('login_redirect_parameter_name', 'destination'),
-    '#description' => t('The alphabetical parameter name used to identify destination defined. For example if the name is set to "destination", then you would visit user/login?destination=(redirect destination).'),
+    '#description' => t('Enter user defined query parameter name same as we have q in drupal core. For example if the parameter name is set to "destination", then you would visit user/login&destination=(redirect destination).'),
   );
   $form['#submit'][] = 'login_redirect_admin_settings_submit';
   return system_settings_form($form);
