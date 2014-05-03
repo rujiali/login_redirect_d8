@@ -1,7 +1,7 @@
 login_redirect.admin:
-  path: 'admin/config/people/login_redirect'
+  path: '/admin/config/people/login-redirect'
   defaults:
-    _form: '\Drupal\login_redirect\Form\LoginRedirectAdminForm'
+    _form: 'Drupal\login_redirect\Form\LoginRedirectAdminForm'
     _title: 'Login redirect settings'
   requirements:
     _permission: 'administer site configuration'
