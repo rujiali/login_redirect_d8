@@ -42,8 +42,11 @@ function login_redirect_help($path, $arg) {
       $variables['title'] = t('Installation');
       $variables['type'] = 'ul';
       $variables['attributes'] = array('');
-      $output .= theme_item_list($variables);
-
+      $render_array = array(
+        '#theme' => 'item_list',
+        '#items' => $variables['items'],
+      );
+      $output .= drupal_render($render_array);
       $output .= '<h3>' . t('Uses') . '</h3>';
       $output .= '<p>' . t('Visit the Login page (usually user/login) and append the redirection URL
 parameter using the parameter name defined in the <a href="@settings">Settings page</a>.
@@ -84,7 +87,7 @@ function login_redirect_form_user_login_alter(&$form, &$form_state, $form_id) {
  */
 function login_redirect_user_login_submit(&$form, &$form_state) {
   if (isset($form_state['values']['destination'])) {
-    $destination = check_plain(filter_xss($form_state['values']['destination']));
+    $destination = \Drupal\Component\Utility\String::checkPlain(filter_xss($form_state['values']['destination']));
     if (valid_url($destination, TRUE)) {
       drupal_register_shutdown_function('login_redirect_perform_redirect', $destination);
     }
