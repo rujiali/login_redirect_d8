@@ -1,0 +1,12 @@
+# Schema for the configuration files of the Login Redirect module
+
+login_redirect.paremeters:
+  type: mapping
+  label: 'Login redirect settings'
+  mapping:
+    status:
+      type: boolean
+      label: 'Module status'
+    parameter:
+      type: string
+      label: 'Parameter name'

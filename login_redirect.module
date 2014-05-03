@@ -59,9 +59,10 @@ to have the user redirected to Google (http://www.google.com) after logging in.'
  * Implements hook_form_alter().
  */
 function login_redirect_form_user_login_alter(&$form, &$form_state, $form_id) {
-  $status = variable_get('login_redirect_status', 0);
+  $config = $config = config('login_redirect.parameters');
+  $status = $config->get('status');
   if ($status !== 0) {
-    $parameter_name = variable_get('login_redirect_parameter_name');
+    $parameter_name = $config->get('parameter_name');
     $params = drupal_get_query_parameters();
     if (isset($params[$parameter_name])) {
       if (!empty($params[$parameter_name])) {
