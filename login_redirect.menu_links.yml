@@ -1,0 +1,5 @@
+login_redirect.admin:
+  title: 'Login redirect settings'
+  parent: user.admin_index
+  description: 'Adjust login redirect settings.'
+  route_name: login_redirect.admin
