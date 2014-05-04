@@ -6,23 +6,6 @@
  */
 
 /**
- * Implements hook_menu().
- */
-function login_redirect_menu() {
-  $items['admin/config/system/login_redirect'] = array(
-    'title' => 'Login Redirect Settings',
-    'description' => 'Adjust Login Redirect settings.',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('login_redirect_admin_settings'),
-    'access arguments' => array('administer site configuration'),
-    'type' => MENU_NORMAL_ITEM,
-    'file' => 'login_redirect.admin.inc',
-  );
-
-  return $items;
-}
-
-/**
  * Implements of hook_help().
  */
 function login_redirect_help($path, $arg) {
@@ -59,18 +42,18 @@ to have the user redirected to Google (http://www.google.com) after logging in.'
   }
 }
 /**
- * Implements hook_form_alter().
+ * Implements hook_FORM_ID_alter().
  */
 function login_redirect_form_user_login_alter(&$form, &$form_state, $form_id) {
-  $config = $config = config('login_redirect.parameters');
+  $config = \Drupal::config('login_redirect.parameters');
   $status = $config->get('status');
   if ($status !== 0) {
     $parameter_name = $config->get('parameter_name');
-    $params = drupal_get_query_parameters();
+    $params = \Drupal\Component\Utility\UrlHelper::filterQueryParameters($parameter_name);
     if (isset($params[$parameter_name])) {
       if (!empty($params[$parameter_name])) {
-        $destination = check_plain(filter_xss($params[$parameter_name]));
-        if (valid_url($destination, TRUE)) {
+        $destination = \Drupal\Component\Utility\String::checkPlain(filter_xss($params[$parameter_name]));
+        if (Drupal\Component\Utility\UrlHelper::isValid($destination, TRUE)) {
           $form['destination'] = array(
             '#type' => 'value',
             '#value' => $destination,
@@ -88,7 +71,7 @@ function login_redirect_form_user_login_alter(&$form, &$form_state, $form_id) {
 function login_redirect_user_login_submit(&$form, &$form_state) {
   if (isset($form_state['values']['destination'])) {
     $destination = \Drupal\Component\Utility\String::checkPlain(filter_xss($form_state['values']['destination']));
-    if (valid_url($destination, TRUE)) {
+    if (Drupal\Component\Utility\UrlHelper::isValid($destination, TRUE)) {
       drupal_register_shutdown_function('login_redirect_perform_redirect', $destination);
     }
   }
@@ -98,5 +81,5 @@ function login_redirect_user_login_submit(&$form, &$form_state) {
  * Perform redirects.
  */
 function login_redirect_perform_redirect($destination) {
-  drupal_goto($destination, array('external' => TRUE));
+  return new RedirectResponse(\Drupal::url($destination));
 }
