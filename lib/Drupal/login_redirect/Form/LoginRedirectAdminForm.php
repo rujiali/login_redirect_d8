@@ -51,7 +51,7 @@ class LoginRedirectAdminForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, array &$form_state) {
-    $config = $this->config('login_redirect')
+    $config = $this->config('login_redirect.parameters')
       ->set('status', $form_state['values']['status'])
       ->set('parameter_name', $form_state['values']['parameter_name']);
 
