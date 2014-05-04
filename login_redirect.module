@@ -5,6 +5,10 @@
  * Allows redirects according to an URL parameter after logins.
  */
 
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use \Drupal\Component\Utility\String;
+use \Drupal\Component\Utility\UrlHelper;
+
 /**
  * Implements of hook_help().
  */
@@ -41,45 +45,36 @@ to have the user redirected to Google (http://www.google.com) after logging in.'
       return $output;
   }
 }
+
 /**
- * Implements hook_FORM_ID_alter().
+ * Implements hook_form_FORM_ID_alter().
  */
-function login_redirect_form_user_login_alter(&$form, &$form_state, $form_id) {
+function login_redirect_form_user_login_form_alter(&$form, &$form_state, $form_id) {
   $config = \Drupal::config('login_redirect.parameters');
   $status = $config->get('status');
   if ($status !== 0) {
     $parameter_name = $config->get('parameter_name');
-    $params = \Drupal\Component\Utility\UrlHelper::filterQueryParameters($parameter_name);
-    if (isset($params[$parameter_name])) {
-      if (!empty($params[$parameter_name])) {
-        $destination = \Drupal\Component\Utility\String::checkPlain(filter_xss($params[$parameter_name]));
-        if (Drupal\Component\Utility\UrlHelper::isValid($destination, TRUE)) {
-          $form['destination'] = array(
-            '#type' => 'value',
-            '#value' => $destination,
-          );
-          $form['#submit'][] = 'login_redirect_user_login_submit';
-        }
-      }
+    if (isset($parameter_name) && !empty($parameter_name)) {
+      $form['login_redirect_destination'] = array(
+        '#type' => 'value',
+        '#value' => $parameter_name,
+      );
+      $form['#submit'][] = 'login_redirect_user_login_submit';
     }
   }
 }
 
 /**
- * Sets shutdown function to perform redirects later.
+ * Send the user to another page if set in options.
  */
 function login_redirect_user_login_submit(&$form, &$form_state) {
-  if (isset($form_state['values']['destination'])) {
-    $destination = \Drupal\Component\Utility\String::checkPlain(filter_xss($form_state['values']['destination']));
-    if (Drupal\Component\Utility\UrlHelper::isValid($destination, TRUE)) {
-      drupal_register_shutdown_function('login_redirect_perform_redirect', $destination);
+  if (isset($form_state['values']['login_redirect_destination'])) {
+    $destination = String::checkPlain(filter_xss($form_state['values']['login_redirect_destination']));
+    $destination = url($destination,array('absolute' => TRUE));
+    if (UrlHelper::isValid($destination)) {
+      $response = new RedirectResponse($destination, 302);
+      $response->send();
+      return $response;
     }
   }
-}
-
-/**
- * Perform redirects.
- */
-function login_redirect_perform_redirect($destination) {
-  return new RedirectResponse(\Drupal::url($destination));
 }
