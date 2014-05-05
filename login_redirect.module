@@ -50,26 +50,41 @@ to have the user redirected to Google (http://www.google.com) after logging in.'
  * Implements hook_form_FORM_ID_alter().
  */
 function login_redirect_form_user_login_form_alter(&$form, &$form_state, $form_id) {
-  $config = \Drupal::config('login_redirect.parameters');
-  $status = $config->get('status');
-  if ($status !== 0) {
-    $parameter_name = $config->get('parameter_name');
-    if (isset($parameter_name) && !empty($parameter_name)) {
-      $form['login_redirect_destination'] = array(
-        '#type' => 'value',
-        '#value' => $parameter_name,
-      );
-      $form['#submit'][] = 'login_redirect_user_login_submit';
+  // It looks like Drupal rebuilds the form post-submission which overwrites
+  // the query parameter set first time. We check the $form_state to see if
+  // the query parameter is already set.
+  if (isset($form_state['input']['login_redirect_destination'])) {
+    $form['login_redirect_destination'] = array(
+      '#type' => 'hidden',
+      '#value' => $form_state['input']['login_redirect_destination'],
+    );
+  }
+  else {
+    $config = \Drupal::config('login_redirect.parameters');
+    $status = $config->get('status');
+    if ($status !== 0) {
+      $parameter_name = $config->get('parameter_name');
+      $query = \Drupal::request()->query->all();
+
+      if (isset($query[$parameter_name]) && !empty($query[$parameter_name])) {
+        $redirect = $query[$parameter_name];
+        $form['login_redirect_destination'] = array(
+          '#type' => 'hidden',
+          '#value' => $redirect,
+        );
+      }
     }
   }
+  $form['#submit'][] = 'login_redirect_user_login_submit';
+
 }
 
 /**
  * Send the user to another page if set in options.
  */
 function login_redirect_user_login_submit(&$form, &$form_state) {
-  if (isset($form_state['values']['login_redirect_destination'])) {
-    $destination = String::checkPlain(filter_xss($form_state['values']['login_redirect_destination']));
+  if (isset($form_state['input']['login_redirect_destination'])) {
+    $destination = String::checkPlain(filter_xss($form_state['input']['login_redirect_destination']));
     $destination = url($destination,array('absolute' => TRUE));
     if (UrlHelper::isValid($destination)) {
       $response = new RedirectResponse($destination, 302);
